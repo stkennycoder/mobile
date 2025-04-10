@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Mobile Accounts Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Auth Modal Styles */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .auth-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close-auth {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .auth-tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #777;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        .auth-submit {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .auth-submit:hover {
+            background: #c0392b;
+        }
+        
+        .auth-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .auth-link a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Main Content (hidden until login) */
+        .main-content {
+            display: none;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        .user-greeting {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-greeting span {
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Accounts Section */
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--accent);
+        }
+        
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0.5rem auto 0;
+        }
+        
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .accounts-table th, 
+        .accounts-table td {
+            padding: 1.2rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .accounts-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .accounts-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .accounts-table tr:hover {
+            background: #f1f1f1;
+        }
+        
+        .account-rating {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .account-price {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        /* Subscription Plans */
+        .plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .plan-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .plan-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .plan-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .plan-price span {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        
+        .plan-features {
+            padding: 1.5rem;
+        }
+        
+        .plan-features ul {
+            list-style: none;
+        }
+        
+        .plan-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .plan-features i {
+            color: var(--success);
+            margin-right: 0.8rem;
+        }
+        
+        .plan-button {
+            display: block;
+            text-align: center;
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem;
+            margin: 0 1.5rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .plan-button:hover {
+            background: #c0392b;
+        }
+        
+        /* About & Contact Section */
+        .about-contact {
+            background: var(--primary);
+            color: white;
+            padding: 4rem 0;
+        }
+        
+        .about-box, 
+        .contact-box {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .about-box h3, 
+        .contact-box h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .about-box p, 
+        .contact-box p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+        
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-method {
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-method i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--accent);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+        
+        .footer-links li {
+            margin: 0 1rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            margin-top: 1rem;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-greeting {
+                margin-top: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .accounts-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .plans {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Modal (shown first) -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-content">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="register">Register</div>
+                <div class="auth-tab" data-tab="login">Login</div>
+            </div>
+            
+            <!-- Registration Form -->
+            <div class="auth-form active" id="register-form">
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm">Confirm Password</label>
+                    <input type="password" id="reg-confirm" placeholder="Confirm your password">
+                </div>
+                <button class="auth-submit" id="register-submit">Register</button>
+                <div class="auth-link">
+                    Already have an account? <a id="show-login">Login here</a>
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email or Username</label>
+                    <input type="text" id="login-email" placeholder="Enter your email or username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button class="auth-submit" id="login-submit">Login</button>
+                <div class="auth-link">
+                    <a id="forgot-password">Forgot your password?</a>
+                </div>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div class="auth-form" id="forgot-form">
+                <div class="form-group">
+                    <label for="forgot-email">Enter your email</label>
+                    <input type="email" id="forgot-email" placeholder="Your registered email">
+                </div>
+                <button class="auth-submit" id="reset-submit">Send Reset Link</button>
+                <div class="auth-link">
+                    Remember your password? <a id="back-to-login">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content (hidden until login) -->
+    <div class="main-content" id="main-content">
+        <!-- Header -->
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">Elite <span>FC</span> Accounts</div>
+                    <div class="user-greeting" id="user-greeting">
+                        <span>Welcome, <span id="username-display"></span></span>
+                        <button class="logout-btn" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Premium FC Mobile Accounts</h1>
+                <p>Own a top-rated FC Mobile account and dominate the competition with elite players and unmatched stats</p>
+                <a href="#accounts" class="btn">Browse Accounts</a>
+            </div>
+        </section>
+
+        <!-- Accounts Section -->
+        <section class="section" id="accounts">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Featured FC Mobile Accounts</h2>
+                    <p>We offer only the highest quality accounts with verified stats and premium players</p>
+                </div>
+                
+                <table class="accounts-table">
+                    <thead>
+                        <tr>
+                            <th>Account ID</th>
+                            <th>Rating</th>
+                            <th>Featured Players</th>
+                            <th>Coins</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>FCMA001</td>
+                            <td><span class="account-rating">104</span></td>
+                            <td>Messi, Ronaldo, Mbappé, Haaland</td>
+                            <td>5.2M</td>
+                            <td class="account-price">$99.99</td>
+                            <td><a href="#" class="btn" style="padding: 0.5rem 1rem;">Buy Now</a></td>
+                        </tr>
+                        <tr>
+                            <td>FCMA002</td>
+                            <td><span class="account-rating">102</span></td>
+                            <td>Neymar, De Bruyne, Van Dijk, Salah</td>
+                            <td>3.8M</td>
+                            <td class="account-price">$79.99</td>
+                            <td><a href="#" class="btn" style="padding: 0.5rem 1rem;">Buy Now</a></td>
+                        </tr>
+                        <tr>
+                            <td>FCMA003</td>
+                            <td><span class="account-rating">101</span></td>
+                            <td>Lewandowski, Benzema, Modrić, Courtois</td>
+                            <td>4.5M</td>
+                            <td class="account-price">$69.99</td>
+                            <td><a href="#" class="btn" style="padding: 0.5rem 1rem;">Buy Now</a></td>
+                        </tr>
+                        <tr>
+                            <td>FCMA004</td>
+                            <td><span class="account-rating">98</span></td>
+                            <td>Son, Kane, Dias, Foden</td>
+                            <td>2.9M</td>
+                            <td class="account-price">$49.99</td>
+                            <td><a href="#" class="btn" style="padding: 0.5rem 1rem;">Buy Now</a></td>
+                        </tr>
+                        <tr>
+                            <td>FCMA005</td>
+                            <td><span class="account-rating">95</span></td>
+                            <td>Pogba, Rashford, Sancho, Fernandes</td>
+                            <td>1.8M</td>
+                            <td class="account-price">$29.99</td>
+                            <td><a href="#" class="btn" style="padding: 0.5rem 1rem;">Buy Now</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Subscription Plans -->
+        <section class="section" style="background: #f9f9f9;">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Premium Subscriptions</h2>
+                    <p>Get exclusive benefits and discounts with our subscription plans</p>
+                </div>
+                
+                <div class="plans">
+                    <div class="plan-card">
+                        <div class="plan-header">
+                            <h3>Starter</h3>
+                            <div class="plan-price">$9.99 <span>/month</span></div>
+                        </div>
+                        <div class="plan-features">
+                            <ul>
+                                <li><i class="fas fa-check"></i> 5% discount on all accounts</li>
+                                <li><i class="fas fa-check"></i> Early access to new accounts</li>
+                                <li><i class="fas fa-check"></i> Basic support</li>
+                                <li><i class="fas fa-check"></i> Weekly account updates</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="plan-button">Get Started</a>
+                    </div>
+                    
+                    <div class="plan-card">
+                        <div class="plan-header" style="background: var(--accent);">
+                            <h3>Pro</h3>
+                            <div class="plan-price">$19.99 <span>/month</span></div>
+                        </div>
+                        <div class="plan-features">
+                            <ul>
+                                <li><i class="fas fa-check"></i> 10% discount on all accounts</li>
+                                <li><i class="fas fa-check"></i> Priority access to new accounts</li>
+                                <li><i class="fas fa-check"></i> 24/7 premium support</li>
+                                <li><i class="fas fa-check"></i> Daily account updates</li>
+                                <li><i class="fas fa-check"></i> Exclusive player picks</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="plan-button">Get Pro</a>
+                    </div>
+                    
+                    <div class="plan-card">
+                        <div class="plan-header">
+                            <h3>Elite</h3>
+                            <div class="plan-price">$29.99 <span>/month</span></div>
+                        </div>
+                        <div class="plan-features">
+                            <ul>
+                                <li><i class="fas fa-check"></i> 15% discount on all accounts</li>
+                                <li><i class="fas fa-check"></i> VIP access to premium accounts</li>
+                                <li><i class="fas fa-check"></i> Dedicated account manager</li>
+                                <li><i class="fas fa-check"></i> Real-time account notifications</li>
+                                <li><i class="fas fa-check"></i> Custom account requests</li>
+                                <li><i class="fas fa-check"></i> Exclusive giveaways</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="plan-button">Go Elite</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About & Contact Section -->
+        <section class="about-contact">
+            <div class="container">
+                <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div class="about-box">
+                        <h3>About Elite FC Accounts</h3>
+                        <p>We are the premier marketplace for premium FC Mobile accounts, specializing in providing gamers with elite-level accounts packed with top players and resources.</p>
+                        <p>Our team of experts carefully verifies each account to ensure authenticity and quality, giving you peace of mind with every purchase.</p>
+                        <p>With years of experience in the gaming industry, we understand what players need to compete at the highest levels.</p>
+                    </div>
+                    
+                    <div class="contact-box">
+                        <h3>Contact Us</h3>
+                        <p>Have questions or need assistance? Our support team is available 24/7 to help you with your account needs.</p>
+                        
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h4>Email</h4>
+                                    <p>support@elitefcaccounts.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h4>Phone</h4>
+                                    <p>+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <i class="fab fa-whatsapp"></i>
+                                <div>
+                                    <h4>WhatsApp</h4>
+                                    <p>+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h4>Hours</h4>
+                                    <p>24/7 Support</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-links">
+                    <li><a href="#accounts">Accounts</a></li>
+                    <li><a href="#">Subscription</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Privacy</a></li>
+                </div>
+                <p class="copyright">© 2023 Elite FC Accounts. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // User Authentication System
+        const authModal = document.getElementById('auth-modal');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const authForms = document.querySelectorAll('.auth-form');
+        const showLogin = document.getElementById('show-login');
+        const backToLogin = document.getElementById('back-to-login');
+        const forgotPassword = document.getElementById('forgot-password');
+        const loginSubmit = document.getElementById('login-submit');
+        const registerSubmit = document.getElementById('register-submit');
+        const resetSubmit = document.getElementById('reset-submit');
+        const mainContent = document.getElementById('main-content');
+        const userGreeting = document.getElementById('user-greeting');
+        const usernameDisplay = document.getElementById('username-display');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // User database in localStorage
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let currentUser = localStorage.getItem('currentUser');
+
+        // Show registration form first
+        showRegisterForm();
+
+        // Switch between auth tabs
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                authForms.forEach(form => form.classList.remove('active'));
+                document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+            });
+        });
+
+        // Show login form
+        function showLoginForm() {
+            authTabs.forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="login"]').classList.add('active');
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('login-form').classList.add('active');
+        }
+
+        // Show register form
+        function showRegisterForm() {
+            authTabs.forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="register"]').classList.add('active');
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('register-form').classList.add('active');
+        }
+
+        // Show forgot password form
+        function showForgotForm() {
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('forgot-form').classList.add('active');
+        }
+
+        // Register new user
+        registerSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('reg-email').value;
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            
+            // Validation
+            if (!email || !username || !password || !confirm) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (users[email]) {
+                alert('Email already registered');
+                return;
+            }
+            
+            // Check if username is taken
+            const usernameTaken = Object.values(users).some(user => user.username === username);
+            if (usernameTaken) {
+                alert('Username already taken');
+                return;
+            }
+            
+            // Store user (in a real app, passwords would be hashed)
+            users[email] = { username, password };
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            alert('Registration successful! Please login.');
+            showLoginForm();
+        });
+
+        // Login user
+        loginSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const loginId = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Find user by email or username
+            let user = null;
+            let userEmail = null;
+            
+            // Check if loginId is an email
+            if (users[loginId]) {
+                user = users[loginId];
+                userEmail = loginId;
+            } else {
+                // Check if loginId is a username
+                for (const email in users) {
+                    if (users[email].username === loginId) {
+                        user = users[email];
+                        userEmail = email;
+                        break;
+                    }
+                }
+            }
+            
+            if (user && user.password === password) {
+                localStorage.setItem('currentUser', user.username);
+                currentUser = user.username;
+                
+                // Hide auth modal and show main content
+                authModal.style.display = 'none';
+                mainContent.style.display = 'block';
+                
+                // Update UI
+                usernameDisplay.textContent = user.username;
+                userGreeting.style.display = 'flex';
+                
+                alert(`Welcome back, ${user.username}!`);
+            } else {
+                alert('Invalid email/username or password');
+            }
+        });
+
+        // Password reset
+        resetSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgot-email').value;
+            
+            if (!users[email]) {
+                alert('Email not found in our system');
+                return;
+            }
+            
+            // In a real app, you would send an email with reset instructions
+            alert(`Password reset link has been sent to ${email} (simulated)`);
+            showLoginForm();
+        });
+
+        // Logout user
+        logoutBtn.addEventListener('click', () => {
+            // Prompt for password before logout
+            const password = prompt('Please enter your password to logout:');
+            
+            if (!password) return;
+            
+            // Find current user's email
+            let userEmail = null;
+            for (const email in users) {
+                if (users[email].username === currentUser) {
+                    userEmail = email;
+                    break;
+                }
+            }
+            
+            if (userEmail && users[userEmail].password === password) {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                
+                // Hide main content and show auth modal
+                mainContent.style.display = 'none';
+                authModal.style.display = 'flex';
+                
+                alert('You have been logged out successfully');
+            } else {
+                alert('Incorrect password. Logout canceled.');
+            }
+        });
+
+        // Event listeners
+        showLogin.addEventListener('click', showLoginForm);
+        backToLogin.addEventListener('click', showLoginForm);
+        forgotPassword.addEventListener('click', showForgotForm);
+    </script>
+</body>
+</html>
